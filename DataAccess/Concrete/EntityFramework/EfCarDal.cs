@@ -60,17 +60,17 @@ namespace DataAccess.Concrete.EntityFramework
         //             : context.Set<Car>().Where(filter).ToList();
         //     }
         // }
-        public List<CarDetailDto> GetCarDetails()
+        public List<CarDetailDto> GetCarDetails(Expression<Func<Car,bool>> filter=null)
         {
             using (CarRentalContext context = new CarRentalContext())
             {
-                var result = from c in context.Cars
+                var result = from c in filter == null ?  context.Cars : context.Cars.Where(filter)
                              join co in context.Colors
                              on c.ColorId equals co.ColorId
                              join b in context.Brands
                              on c.BrandId equals b.BrandId
                              select new CarDetailDto {
-
+                                CarId = c.Id,
                                 BrandName = b.BrandName,
                                 ColorName = co.ColorName,
                                 DailyPrice = c.DailyPrice,
