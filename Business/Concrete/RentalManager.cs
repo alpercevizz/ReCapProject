@@ -3,8 +3,10 @@ using Business.Constants;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using Entities.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Business.Concrete
@@ -20,8 +22,15 @@ namespace Business.Concrete
 
         public IResult Add(Rental rental)
         {
+            if (rental.ReturnDate == null && _rentalDal.GetCarDetails(r => r.CarId == rental.CarId).Count > 0)
+            {
+                return new ErrorResult(Messages.FailedRentalAddOrUpdate);
+            }
+
             _rentalDal.Add(rental);
             return new SuccessResult(Messages.AddedRental);
+
+            
         }
 
         public IResult Delete(Rental rental)
@@ -38,6 +47,11 @@ namespace Business.Concrete
         public IDataResult<Rental> GetById(int id)
         {
             return new SuccessDataResult<Rental>(_rentalDal.Get(r => r.Id == id));
+        }
+
+        public IDataResult<List<RentalDetailDto>> GetRentalDetails(Expression<Func<Rental, bool>> filter = null)
+        {
+            return new SuccessDataResult<List<RentalDetailDto>>(_rentalDal.GetCarDetails(filter), Messages.ReturnedRental);
         }
 
         public IResult Update(Rental rental)
