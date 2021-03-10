@@ -20,5 +20,6 @@ namespace Business.Abstract
         //List<Car> GetByModelYear(string year);
         IDataResult<Car> GetById(int id);
         IDataResult<List<CarDetailDto>> GetCarDetails(Expression<Func<Car,bool>> filter = null);
+        IResult TransactionalOperation(Car car);
     }
 }
